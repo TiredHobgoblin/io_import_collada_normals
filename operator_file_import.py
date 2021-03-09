@@ -1,6 +1,12 @@
 import bpy
 import xml.etree.ElementTree as ET
 
+bl_info = {
+    "name": "Import Collada Custom Normals",
+    "blender": (2, 80, 0),
+    "category": "Import-Export",
+}
+
 def read_some_data(context, filepath):
     print("Importing normals...")
     tree = ET.parse(filepath)
@@ -82,7 +88,7 @@ class ImportSomeData(Operator, ImportHelper):
 
 # Only needed if you want to add into a dynamic menu
 def menu_func_import(self, context):
-    self.layout.operator(ImportSomeData.bl_idname, text="Text Import Operator")
+    self.layout.operator(ImportSomeData.bl_idname, text="Import Collada Normals (.dae)")
 
 
 def register():
