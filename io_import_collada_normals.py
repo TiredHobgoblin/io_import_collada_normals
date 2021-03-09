@@ -19,7 +19,7 @@ def read_some_data(context, filepath):
     
     normals = {"objectname" : "objectnormals"}
     
-    for node in visual_scene:
+    for node in visual_scene.iter("{http://www.collada.org/2005/11/COLLADASchema}node"):
         numberwithname = 0
         for object in bpy.context.selected_objects:
             if node.attrib["name"] == object.name:
@@ -28,12 +28,17 @@ def read_some_data(context, filepath):
             continue
         
         # Locate geometry for scene node
-        instance_controller = node.find("./{http://www.collada.org/2005/11/COLLADASchema}instance_controller")
-        if instance_controller is None:
-            continue
-        controllerid = instance_controller.attrib["url"].replace("#", "")
-        controller = library_controllers.find("./{http://www.collada.org/2005/11/COLLADASchema}controller[@id='"+controllerid+"']")
-        meshid = controller.find("./{http://www.collada.org/2005/11/COLLADASchema}skin").attrib["source"].replace("#", "")
+        instance_geometry = node.find("./{http://www.collada.org/2005/11/COLLADASchema}instance_geometry")
+        meshid = ""
+        if instance_geometry is None:
+            instance_controller = node.find("./{http://www.collada.org/2005/11/COLLADASchema}instance_controller")
+            if instance_controller is None:
+                continue
+            controllerid = instance_controller.attrib["url"].replace("#", "")
+            controller = library_controllers.find("./{http://www.collada.org/2005/11/COLLADASchema}controller[@id='"+controllerid+"']")
+            meshid = controller.find("./{http://www.collada.org/2005/11/COLLADASchema}skin").attrib["source"].replace("#", "")
+        else:
+            meshid = instance_geometry.attrib["url"].replace("#", "")
         geometry = library_geometries.find("./{http://www.collada.org/2005/11/COLLADASchema}geometry[@id='"+meshid+"']")
         
         # Pick out normals
