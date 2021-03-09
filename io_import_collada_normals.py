@@ -74,7 +74,7 @@ from bpy.types import Operator
 
 
 class ImportSomeData(Operator, ImportHelper):
-    """This appears in the tooltip of the operator and in the generated docs"""
+    """Import custom mesh normals from a Collada file."""
     bl_idname = "import_test.some_data"  # important since its how bpy.ops.import_test.some_data is constructed
     bl_label = "Import Normals"
 
@@ -86,7 +86,7 @@ class ImportSomeData(Operator, ImportHelper):
         options={'HIDDEN'},
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
-
+    
     def execute(self, context):
         return read_some_data(context, self.filepath)
 
