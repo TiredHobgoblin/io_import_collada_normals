@@ -44,8 +44,12 @@ def read_some_data(context, filepath):
         # Pick out normals
         mesh = geometry.find("./{http://www.collada.org/2005/11/COLLADASchema}mesh")
         triangles = mesh.find("./{http://www.collada.org/2005/11/COLLADASchema}triangles")
-        normalinput = triangles.find("./{http://www.collada.org/2005/11/COLLADASchema}input[@semantic='NORMAL']").attrib["source"].replace("#", "")
-        normalsource = mesh.find("./{http://www.collada.org/2005/11/COLLADASchema}source[@id='"+normalinput+"']")
+        normalinput = triangles.find("./{http://www.collada.org/2005/11/COLLADASchema}input[@semantic='NORMAL']")
+        if normalinput is None:
+            print ( node.attrib["name"] + " has no custom normals.")
+            continue
+        normalid = normalinput.attrib["source"].replace("#", "")
+        normalsource = mesh.find("./{http://www.collada.org/2005/11/COLLADASchema}source[@id='"+normalid+"']")
         normals[node.attrib["name"]] = normalsource.find("./{http://www.collada.org/2005/11/COLLADASchema}float_array").text.split()
         
         for object in bpy.context.selected_objects:
@@ -54,14 +58,16 @@ def read_some_data(context, filepath):
             formattednormals = [[0,0,0] for i in range(len(normals[node.attrib["name"]])//3)]
             for i in range(len(normals[node.attrib["name"]])):
                 formattednormals[i//3][i%3] = float(normals[node.attrib["name"]][i])
-                
-            print(formattednormals)
-                
+                                
             bpy.context.view_layer.objects.active = object
             bpy.ops.mesh.customdata_custom_splitnormals_add()
             object.data.use_auto_smooth = True
             
             object.data.normals_split_custom_set_from_vertices(formattednormals)
+            
+            print("Imported normals for "+object.name+".")
+            
+    print("Done.")
 
     return {'FINISHED'}
 
